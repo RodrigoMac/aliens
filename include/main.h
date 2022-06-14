@@ -28,6 +28,6 @@ private:
     ship m_ship;
     bullet shot;
     bulletpool m_bullets;
-    
-    
+    alien m_alien;
+
 };

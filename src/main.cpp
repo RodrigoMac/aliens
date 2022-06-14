@@ -32,6 +32,8 @@ void game::renderFrame()
       {
          m_window.draw( m_bullets[ i ] );
       }
+      
+      m_window.draw(m_alien);
 
       m_window.display();
       msleep( 1 );
