@@ -1,0 +1,9 @@
+
+colocar move na main() 
+    move não é atributo da main
+    move é geral para todos os objetos
+    move teria que chamar função secundaria set_position do objetos
+    move seria função unica para todas as classes
+    
+colocar move nos objetos
+    
