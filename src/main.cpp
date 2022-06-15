@@ -1,7 +1,10 @@
-//g++ main.cpp ship.cpp bullet.cpp bulletpool.cpp alien.cpp -o game -lsfml-graphics -lsfml-window -lsfml-system -lpthread
+//g++ main.cpp ship.cpp bullet.cpp bulletpool.cpp alien.cpp alienpool.cpp -o game -lsfml-graphics -lsfml-window -lsfml-system -lpthread
+
+//usar chrono?
 
 #include "../include/main.h"
 
+#include <X11/Xlib.h>
 #include <iostream>
 #include <unistd.h>
 
@@ -11,11 +14,16 @@ game::game()
 {
    m_window.create( sf::VideoMode( 800, 800 ), "Aliens" );
    m_window.setKeyRepeatEnabled( false );
+
+   timer = clock.now();
+
+   m_aliens.getAlien( sf::Vector2f( 40, 40 ) );
+   m_aliens.getAlien( sf::Vector2f( 40, 120 ) );
 }
 
 bool game::active()
 {
-    return m_window.isOpen();
+   return m_window.isOpen();
 }
 
 void game::renderFrame()
@@ -32,16 +40,22 @@ void game::renderFrame()
       {
          m_window.draw( m_bullets[ i ] );
       }
-      
-      m_window.draw(m_alien);
+
+      m_aliens.move();
+      for( auto i = 0; i < m_aliens.size(); ++i )
+      {
+         m_window.draw( m_aliens[ i ] );
+      }
 
       m_window.display();
-      msleep( 1 );
    }
+
+   msleep( 1 );
 }
 
 void game::inputHandler()
 {
+   bool holdfire = false;
    while( m_window.isOpen() )
    {
       if( m_window.pollEvent( m_event ) )
@@ -50,15 +64,17 @@ void game::inputHandler()
          {
             if( m_event.key.code == sf::Keyboard::A )
             {
-               m_ship.setSpeed(-0.5);
+               m_ship.setSpeed( -0.5 );
             }
             else if( m_event.key.code == sf::Keyboard::D )
             {
-               m_ship.setSpeed(0.5);
+               m_ship.setSpeed( 0.5 );
             }
             else if( m_event.key.code == sf::Keyboard::Space )
             {
-               m_bullets.getBullet( m_ship.getPosition() );
+               holdfire = true;
+               timer = clock.now();
+               //m_bullets.getBullet( m_ship.getPosition() );
             }
             else if( m_event.key.code == sf::Keyboard::Escape )
             {
@@ -71,11 +87,41 @@ void game::inputHandler()
          {
             if( m_event.key.code == sf::Keyboard::A )
             {
-               m_ship.setSpeed(0.5);
+               m_ship.setSpeed( 0.5 );
             }
             else if( m_event.key.code == sf::Keyboard::D )
             {
-               m_ship.setSpeed(-0.5);
+               m_ship.setSpeed( -0.5 );
+            }
+            else if( m_event.key.code == sf::Keyboard::Space )
+            {
+               holdfire = false;
+            }
+         }
+      }
+
+      if( holdfire && (std::chrono::duration_cast< std::chrono::duration< int, std::milli > >( std::chrono::high_resolution_clock::now() - timer )).count() > 50)
+      {
+         m_bullets.getBullet( m_ship.getPosition() );
+         timer = clock.now();
+      }
+
+      msleep( 1 );
+   }
+}
+
+void game::hitDetection()
+{
+   while( m_window.isOpen() )
+   {
+      for( auto i = 0; i < m_bullets.size(); ++i )
+      {
+         for( auto j = 0; j < m_aliens.size(); j++ )
+         {
+            if( m_bullets[ i ].m_hitbox.intersects( m_aliens[ j ].m_hitbox ) )
+            {
+               m_bullets[ i ].disable();
+               m_aliens[ j ].disable();
             }
          }
       }
@@ -90,17 +136,21 @@ void game::inputHandler()
 
 int main()
 {
+   XInitThreads();
+
    game session;
 
    std::thread screen( &game::renderFrame, std::ref( session ) );
    screen.detach();
    std::thread input( &game::inputHandler, std::ref( session ) );
    input.detach();
+   std::thread collision( &game::hitDetection, std::ref( session ) );
+   collision.detach();
 
    while( session.active() )
    {
       msleep( 1 );
    }
-   
+
    return 0;
 }

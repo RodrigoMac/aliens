@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../include/alien.h"
+#include "../include/alienpool.h"
 #include "../include/bullet.h"
 #include "../include/bulletpool.h"
 #include "../include/ship.h"
@@ -11,6 +12,7 @@
 #include <vector>
 #include <deque>
 #include <thread>
+#include <chrono>
 
 class game
 {
@@ -21,13 +23,16 @@ public:
     bool active();
     void renderFrame();
     void inputHandler();
+    void hitDetection();
     
 private:
     sf::RenderWindow m_window;
     sf::Event m_event;
     ship m_ship;
-    bullet shot;
     bulletpool m_bullets;
-    alien m_alien;
-
+    alienpool m_aliens;
+    std::chrono::high_resolution_clock clock;
+    std::chrono::high_resolution_clock::time_point timer;
+    
+    std::chrono::duration<int, std::milli> timecount;
 };
