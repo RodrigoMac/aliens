@@ -24,6 +24,7 @@ public:
     void renderFrame();
     void inputHandler();
     void hitDetection();
+    void fire(bool const& holdfire);
     
 private:
     sf::RenderWindow m_window;
@@ -33,6 +34,4 @@ private:
     alienpool m_aliens;
     std::chrono::high_resolution_clock clock;
     std::chrono::high_resolution_clock::time_point timer;
-    
-    std::chrono::duration<int, std::milli> timecount;
 };

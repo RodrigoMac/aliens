@@ -1,8 +1,7 @@
 //g++ main.cpp ship.cpp bullet.cpp bulletpool.cpp alien.cpp alienpool.cpp -o game -lsfml-graphics -lsfml-window -lsfml-system -lpthread
 
-//usar chrono?
-
 #include "../include/main.h"
+#include "../include/movepattern.h"
 
 #include <X11/Xlib.h>
 #include <iostream>
@@ -17,8 +16,10 @@ game::game()
 
    timer = clock.now();
 
-   m_aliens.getAlien( sf::Vector2f( 40, 40 ) );
-   m_aliens.getAlien( sf::Vector2f( 40, 120 ) );
+   //m_aliens.getAlien( sf::Vector2f( , 40 ), STRAIGHT );
+   m_aliens.getAlien( sf::Vector2f( 100, 40 ), ZZSHORT );
+   m_aliens.getAlien( sf::Vector2f( 200, 120 ), ZZMEDIUM );
+   m_aliens.getAlien( sf::Vector2f( 400, 200 ), ZZLONG );
 }
 
 bool game::active()
@@ -73,8 +74,6 @@ void game::inputHandler()
             else if( m_event.key.code == sf::Keyboard::Space )
             {
                holdfire = true;
-               timer = clock.now();
-               //m_bullets.getBullet( m_ship.getPosition() );
             }
             else if( m_event.key.code == sf::Keyboard::Escape )
             {
@@ -99,15 +98,20 @@ void game::inputHandler()
             }
          }
       }
+      
+      fire(holdfire);
 
-      if( holdfire && (std::chrono::duration_cast< std::chrono::duration< int, std::milli > >( std::chrono::high_resolution_clock::now() - timer )).count() > 50)
+      msleep( 1 );
+   }
+}
+
+void game::fire(bool const& holdfire)
+{
+    if( holdfire && (std::chrono::duration_cast< std::chrono::duration< int, std::milli > >( std::chrono::high_resolution_clock::now() - timer )).count() > 50)
       {
          m_bullets.getBullet( m_ship.getPosition() );
          timer = clock.now();
       }
-
-      msleep( 1 );
-   }
 }
 
 void game::hitDetection()

@@ -1,12 +1,12 @@
 #include "../include/alienpool.h"
 
-void alienpool::getAlien(sf::Vector2f const& origin)
+void alienpool::getAlien(sf::Vector2f const& origin, int const& pattern)
 {
     for(auto i = 0; i < this->size(); ++i)
     {
         if(!this->at(i).isActive())
         {
-            this->at(i).reset(origin);
+            this->at(i).reset(origin, pattern);
             return;
         }
     }

@@ -10,13 +10,12 @@ public:
    ~bullet() = default;
    
    sf::FloatRect m_hitbox;
-
+   
    void reset( sf::Vector2f const& origin );
    void move();
    bool isActive();
    void disable();
 
 private:
-    float m_speed = 2;
-    //sf::FloatRect m_hitbox;
+    float m_speed = 2;     
 };

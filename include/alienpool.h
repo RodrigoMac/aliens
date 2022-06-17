@@ -11,6 +11,6 @@ public:
     alienpool() = default;
     ~alienpool() = default;
     
-    void getAlien(sf::Vector2f const& origin);
+    void getAlien(sf::Vector2f const& origin, int const& pattern);
     void move();
 };
